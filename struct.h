@@ -1,20 +1,26 @@
-typedef struct comicacaoServer{
-    int idComando; //identificador do comando que é dado quando o servidor o recebe "contador"
-    int operaçao;// nao precisa de ser um inteiro(pode ser uma string)!! 1 significa que é um execute -u, 2 significa execute -p, 3 - um status ect....
-    int tempoEsperadoParaExecutar; // exemplo : 100 ms
+#include <time.h>
+
+typedef struct minfo{
+    int id; //identificador do comando que é dado quando o servidor o recebe, "contador"
+    int operaçao;//  1 == -u, 2 == -p, 3 == status
+    int time; // tempo esperado, exemplo : 100 ms
     int pid; // para entrar em contacto com o cliente
     struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
+    //biblioteca do struct timeeval
+    //long int tv_usec
+    //The number of microseconds elapsed since the time given by the tv_sec member.
     struct timeval end; // quando o filho termina de executar
-    char nomePrograma[300]; // argv3 stringSize valor estatico ex 30 "ls cat serv" filho no server vai partir a string por espaços 300 parece pequeno para a flag -p
-}*ect,Elemento; // Elemento = struct comicacaoServer
+    
+    char nome[512]; 
+}minfo;
 
-"""""
-Lista no servidor vai ser uma lista de elemento
+/*
+Lista no servidor vai ser uma lista de minfo
 
-Elemento lista[4048]; //numero 2^n
+Elemento lista[2048]; //numero 2^n
 
 Filho termina de executar e comunica ao pai  -> pai escreve para no mesmo ficheiro (escrever o que esta no enunciado)
-"""""
+*/
 
 // Exemplo de outro algoritmo sem ser o FIFO (First in first out - executar por ordem de chegada), ter a lista ordenada por os que demoram menos tempo a executar 
 
