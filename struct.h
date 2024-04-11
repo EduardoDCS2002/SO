@@ -2,7 +2,7 @@
 
 typedef struct minfo{
     int id; //identificador do comando que é dado quando o servidor o recebe, "contador"
-    int operaçao;//  1 == -u, 2 == -p, 3 == status
+    char* operaçao;//  1 == -u, 2 == -p, 3 == status
     int time; // tempo esperado, exemplo : 100 ms
     int pid; // para entrar em contacto com o cliente
     struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
@@ -11,7 +11,7 @@ typedef struct minfo{
     //The number of microseconds elapsed since the time given by the tv_sec member.
     struct timeval end; // quando o filho termina de executar
     
-    char nome[512]; 
+    char *nome; 
 }minfo;
 
 /*
