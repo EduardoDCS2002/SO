@@ -1,7 +1,3 @@
-#include <sys/types.h>
-#include <unistd.h>  //chamadas ao sistema: defs e decls essenciais
-#include <fcntl.h>  //O_RDONLY, O_WRONLY, O_CREAT, O_*
-#include <stdio.h>
 #include "struct.h"
 
 //forma de correr o client
@@ -23,47 +19,64 @@ struct timeval start; //tempo de inicio atualizar o valor quando chega ao servid
     //The number of microseconds elapsed since the time given by the tv_sec member.
 struct timeval end; // quando o filho termina de executar
     
-char nome[512];
+char nome[300];
 */
 
 
 
 
 int main(int argc, char **argv){   //argc: numero de argumentos presentes no argv; //argv: argumentos passados na inicializaçao do programa (ex: ./client execute -u "...") 
-    if(argc<2){
-        perror("Few arguments!");
+    if(argc!=2 || argc!=5){
+        perror("Wrong number of arguments!");
         return -1;
     }
-    char *args[20];
-	char *string, *cmd, *tofree;
-	int i=0;
-	tofree = cmd = strdup(**argv);
-	while((string = strsep(&cmd," "))!=NULL){
-	   args[i]=string;
-	   i++;
-	}
-	args[i]=NULL;
-    free(tofree);                                      
-    if (argc <   5){                        //5: porque o argv[0] = ./client
-        if (argc == 2 &&  strcmp(argv[1],"status") == 0){         //1º evitar segmentation fault, 2º exemplo do enunciado ($ ./client status)
-        //criar um processo novo e criar dois fifos(para ler e escrever no server), criar uma estrutura minfo e enviar;
-        }else{
-            perror("Few arguments!");
+    minfo mensagem;
+    mensagem.pid = getpid();
+    mensagem.tipo = 0;
+    if (argc == 2 &&  strcmp(argv[1],"status") == 0){
+        mensagem.operaçao = 2;
+        mensagem.time = 0;
+        mensagem.nome = "status";
+    }else{ // para ter a certeza que não há erros no input
+        if(!(strcmp(argv[1], "execute")) ||  
+        !(strcmp(argv[3],"-u") || strcmp(argv[3], "-p")) ||
+        !(atoi(argv[2]>0))){ //verificar o argv[4] no server
+            perror("Arguments don't have the correct values!");
             return -1;
         }
-    }else{ // mandar a informação e o servidor deve devolver o número do processo ao cliente para o cliente dar ao utilizador
-        if(args[3] == "-u"){
-            minfo info;
-            info.time = atoi(args[2]);
-            info.operaçao = args[3];
-            info.nome = args[4];
-        }else{ // args[3] == "-p"
-            if(args[3]!= "-p"){
-                perror("algo de errado não está certo, só vale -p ou -u.");
-                return -1;
-            }
-        }
+        mensagem.time = argv[2];
+        mensagem.operaçao = strcmp(argv[3],"-u");
+        mensagem.nome = argv[4];
     }
-    
+
+    char fifoc_name[30];
+	sprintf(fifoc_name, CLIENT "%d", mensagem.pid);
+	if(mkfifo(fifoc_name, 0666)==-1){
+		perror("erro ao criar o fifo");
+		return -1;
+	}
+
+    //printf("--- fifo do clinte criado ---\n");
+	int fifoserver_fd = open(SERVER, O_WRONLY);
+	//printf("--- fifo do server aberto ---\n");
+    write(fifoserver_fd,&mensagem, sizeof(mensagem));
+	//printf("--- mensagem mandada para o server ---\n");
+	close(fifoserver_fd);
+
+    int fifocliente_fd = open(fifoc_name, O_RDONLY);
+	//printf("--- fifo do clinte aberto ---\n");
+	read(fifocliente_fd, &mensagem, sizeof(mensagem));
+	//printf("--- mensagem lida ---\n");
+
+    unlink(fifoc_name);
+
+    if(mensagem.operaçao != 2){
+        char* output;
+        sprintf(output, "Task %d received",mensagem.id);
+
+        write(1,output, sizeof(output));
+    }else{
+        //imprimir o status bonitinho ou o server faz tudo?
+    }
     return 0;
 }
