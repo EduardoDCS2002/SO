@@ -9,16 +9,17 @@
 //sempre que um cliente entrar em contacto, incrementar 1 e retornar
 int main(int argc, char * argv[]){
     if(!strcmp(argv[1],OUTPUT) 
-    || 0>=atoi(argv[2]) 
-    || (strcmp(argv[3], "FCFS") 
+    || !(0>atoi(argv[2])) 
+    || !(strcmp(argv[3], "FCFS") 
         || strcmp(argv[3], "SJF") 
         || strcmp(argv[3], "CUSTOM"))){
             perror("erro no input");
             return -1;
         }
-    int countID = 1001;
-    int countPT = 0;
-    minfo filaEspera[atoi(argv[2])];
+    int countID = 1001; // id das mensagens
+    int countPT = 0; // quantos processos estão a decorrer neste momento
+    int sizefila = 10*atoi(argv[2]);
+    minfo filaEspera[sizefila];
     
     minfo mensagem;
     
