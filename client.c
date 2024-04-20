@@ -34,7 +34,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
     mensagem.pid = getpid();
     mensagem.tipo = 0;
     if (argc == 2 &&  strcmp(argv[1],"status") == 0){
-        mensagem.operaçao = 2;
+        mensagem.operacao = 2;
         mensagem.time = 0;
         mensagem.nome = "status";
     }else{ // para ter a certeza que não há erros no input
@@ -45,7 +45,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
             return -1;
         }
         mensagem.time = argv[2];
-        mensagem.operaçao = strcmp(argv[3],"-u");
+        mensagem.operacao = strcmp(argv[3],"-u");
         mensagem.nome = argv[4];
     }
 
@@ -65,18 +65,20 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 
     int fifocliente_fd = open(fifoc_name, O_RDONLY);
 	//printf("--- fifo do clinte aberto ---\n");
-	read(fifocliente_fd, &mensagem, sizeof(mensagem));
-	//printf("--- mensagem lida ---\n");
 
-    unlink(fifoc_name);
-
-    if(mensagem.operaçao != 2){
+    if(mensagem.operacao != 2){
+        read(fifocliente_fd, &mensagem, sizeof(mensagem));
         char* output;
-        sprintf(output, "Task %d received",mensagem.id);
+        sprintf(output, "Task (id %d, pid %d) received", mensagem.id, mensagem.pid);
 
         write(1,output, sizeof(output));
     }else{
-        //imprimir o status bonitinho ou o server faz tudo?
+        char statusoutput[512];
+        read(fifocliente_fd, &statusoutput, sizeof(statusoutput));
+        write(1,statusoutput, sizeof(statusoutput));
     }
+    
+    unlink(fifoc_name);
+
     return 0;
 }

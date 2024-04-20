@@ -7,13 +7,13 @@
 #define SERVER "fifo_server" 
 #define CLIENT "fifo_client"
 #define sizeExecute 300
-#define OUTPUT "output-folder"
+#define OUTPUT "/output-folder/"
 
 typedef struct minfo{
     int id; //identificador do comando que é dado quando o servidor o recebe, "contador"
     int tipo; // 0 se for mensagem normal 
     // e 1 se for um filho do server a mandar para o server
-    int operaçao;//  0 == -p, 1 == -u, 2 == status
+    int operacao;//  0 == -p, 1 == -u, 2 == status
     int time; // tempo esperado, exemplo : 100 ms
     int pid; // para entrar em contacto com o cliente
     struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
