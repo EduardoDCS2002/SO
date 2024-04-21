@@ -26,59 +26,70 @@ char nome[300];
 
 
 int main(int argc, char **argv){   //argc: numero de argumentos presentes no argv; //argv: argumentos passados na inicializaçao do programa (ex: ./client execute -u "...") 
-    if(argc!=2 || argc!=5){
+
+//Verifica se o número de argumentos está correto
+    if(argc!=2 && argc!=5){
         perror("Wrong number of arguments!");
         return -1;
     }
+    
+//Preenche a estrutura "mensagem" correspondente com o input
     minfo mensagem;
     mensagem.pid = getpid();
     mensagem.tipo = 0;
-    if (argc == 2 &&  strcmp(argv[1],"status") == 0){
+    mensagem.custom = 0;
+    
+    if (argc == 2 &&  strcmp(argv[1],"status") == 1){
         mensagem.operacao = 2;
         mensagem.time = 0;
         mensagem.nome = "status";
+    
     }else{ // para ter a certeza que não há erros no input
-        if(!(strcmp(argv[1], "execute")) ||  
-        !(strcmp(argv[3],"-u") || strcmp(argv[3], "-p")) ||
-        !(atoi(argv[2]>0))){ //verificar o argv[4] no server
+        if((0 == strcmp(argv[1], "execute")) &&  
+        ((0 == strcmp(argv[3],"-u")) || (0 == strcmp(argv[3], "-p"))) &&
+        (0 ==atoi(argv[2])>0)){ //verificar o argv[4] no server
+            
             perror("Arguments don't have the correct values!");
             return -1;
         }
-        mensagem.time = argv[2];
+        
+        mensagem.time = atoi(argv[2]);
         mensagem.operacao = strcmp(argv[3],"-u");
         mensagem.nome = argv[4];
     }
 
+//Cria o FIFO do cliente para depois ler
     char fifoc_name[30];
 	sprintf(fifoc_name, CLIENT "%d", mensagem.pid);
-	if(mkfifo(fifoc_name, 0666)==-1){
+	
+    if(mkfifo(fifoc_name, 0666)==-1){
 		perror("erro ao criar o fifo");
 		return -1;
 	}
 
-    //printf("--- fifo do clinte criado ---\n");
 	int fifoserver_fd = open(SERVER, O_WRONLY);
-	//printf("--- fifo do server aberto ---\n");
-    write(fifoserver_fd,&mensagem, sizeof(mensagem));
-	//printf("--- mensagem mandada para o server ---\n");
+	
+//Escreve a mensagem no FIFO do servidor
+    write(fifoserver_fd,&mensagem, sizeof(minfo));
 	close(fifoserver_fd);
 
+//Abre o FIFO do cliente para leitura
     int fifocliente_fd = open(fifoc_name, O_RDONLY);
-	//printf("--- fifo do clinte aberto ---\n");
 
+//Lê e processa a resposta do servidor
     if(mensagem.operacao != 2){
-        read(fifocliente_fd, &mensagem, sizeof(mensagem));
+        read(fifocliente_fd, &mensagem, sizeof(minfo));
         char* output;
         sprintf(output, "Task (id %d, pid %d) received", mensagem.id, mensagem.pid);
 
-        write(1,output, sizeof(output));
+        write(1,output, strlen(output));
+    
     }else{
         char statusoutput[512];
-        read(fifocliente_fd, &statusoutput, sizeof(statusoutput));
-        write(1,statusoutput, sizeof(statusoutput));
+        read(fifocliente_fd, &statusoutput, strlen(statusoutput));
+        write(1,statusoutput, strlen(statusoutput));
     }
     
     unlink(fifoc_name);
-
     return 0;
 }

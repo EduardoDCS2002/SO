@@ -3,6 +3,10 @@
 #include <unistd.h>  //chamadas ao sistema: defs e decls essenciais
 #include <fcntl.h>  //O_RDONLY, O_WRONLY, O_CREAT, O_*
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+
 
 #define SERVER "fifo_server" 
 #define CLIENT "fifo_client"
@@ -10,19 +14,17 @@
 #define OUTPUT "/output-folder/"
 
 typedef struct minfo{
-    int id; //identificador do comando que é dado quando o servidor o recebe, "contador"
+    int id;
     int tipo; // 0 se for mensagem normal 
     // e 1 se for um filho do server a mandar para o server
     int operacao;//  0 == -p, 1 == -u, 2 == status
-    int time; // tempo esperado, exemplo : 100 ms
+    int time;
     int pid; // para entrar em contacto com o cliente
+    int custom; // para a política de escalonamento CUSTOM
     struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
-    //biblioteca do struct timeeval
-    //long int tv_usec
-    //The number of microseconds elapsed since the time given by the tv_sec member.
     struct timeval end; // quando o filho termina de executar
-    
-    char *nome; 
+    char *execucao;
+    char *nome;
 }minfo;
 
 /*
