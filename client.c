@@ -32,9 +32,14 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         perror("Wrong number of arguments!");
         return -1;
     }
+    //preenche tudo da mensagem
+    minfo mensagem;
+    mensagem.id = 0;
+    gettimeofday(&mensagem.start,NULL);
+    gettimeofday(&mensagem.end,NULL);
+    mensagem.execucao = "";
     
 //Preenche a estrutura "mensagem" correspondente com o input
-    minfo mensagem;
     mensagem.pid = getpid();
     mensagem.tipo = 0;
     mensagem.custom = 0;
