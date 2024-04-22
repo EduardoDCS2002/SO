@@ -51,18 +51,14 @@ int sc_SJF(minfo (*fila)[], int N){
 int sc_CUSTOM(minfo (*fila)[], int N){ // se um gajo for ultrapassado, o mensagem.custom dele soma 1
     int menor_tempo = (*fila)[0].time; // se o mensagem.custom dele chegar a 3, ele é o escolhido.
     int indice_escolhido = 0;
-    int ultrapassagem = (*fila)[0].custom;
-    
-    if(ultrapassagem < 3){
-        for (int i = 1; i< N; i++){
-            if((*fila)[i].custom >=3){
+    for (int i = 0; i< N; i++){
+        if((*fila)[i].custom >=3){
+            indice_escolhido = i;
+            break;
+        }else{
+            if((*fila)[i].time < menor_tempo){
+                menor_tempo = (*fila)[i].time;
                 indice_escolhido = i;
-                break;
-            }else{
-                if((*fila)[i].time < menor_tempo){
-                    menor_tempo = (*fila)[i].time;
-                    indice_escolhido = i;
-                }
             }
         }
     }
