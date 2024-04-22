@@ -70,7 +70,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 	int fifoserver_fd = open(SERVER, O_WRONLY);
 	
 //Escreve a mensagem no FIFO do servidor
-    write(fifoserver_fd,&mensagem, sizeof(minfo));
+    write(fifoserver_fd,&mensagem, sizeof(struct minfo));
 	close(fifoserver_fd);
 
 //Abre o FIFO do cliente para leitura
@@ -78,7 +78,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 
 //Lê e processa a resposta do servidor
     if(mensagem.operacao != 2){
-        read(fifocliente_fd, &mensagem, sizeof(minfo));
+        read(fifocliente_fd, &mensagem, sizeof(struct minfo));
         char* output;
         sprintf(output, "Task (id %d, pid %d) received", mensagem.id, mensagem.pid);
 

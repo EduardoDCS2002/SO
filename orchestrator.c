@@ -116,8 +116,8 @@ int main(int argc, char * argv[]){
     
 //Loop principal do servidor para receber mensagens dos clientes
     while(1){
-	    int read_bytes = read(fifoserver_fd, &mensagem, sizeof(minfo));
-	    if (read_bytes != sizeof(minfo)){
+	    int read_bytes = read(fifoserver_fd, &mensagem, sizeof(struct minfo));
+	    if (read_bytes != sizeof(struct minfo)){
 	    	perror("struct recebida errada ou mal");
 	    	mensagem.tipo = 16;
             mensagem.operacao = 16;
@@ -200,7 +200,7 @@ int main(int argc, char * argv[]){
                     gettimeofday(&mensagem.end, NULL);
 
                     int fifoserver_fd = open(SERVER, O_WRONLY);
-                    write(fifoserver_fd,&mensagem, sizeof(minfo));
+                    write(fifoserver_fd,&mensagem, sizeof(struct minfo));
 	                close(fifoserver_fd);
                     _exit(0);
                 }
@@ -269,7 +269,7 @@ int main(int argc, char * argv[]){
                     gettimeofday(&mensagem.end, NULL);
 
                     int fifoserver_fd = open(SERVER, O_WRONLY);
-                    write(fifoserver_fd,&mensagem, sizeof(minfo));
+                    write(fifoserver_fd,&mensagem, sizeof(struct minfo));
 	                close(fifoserver_fd);
                     _exit(0);
 
