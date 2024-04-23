@@ -16,7 +16,7 @@ int pid; // para entrar em contacto com o cliente
 struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
     //biblioteca do struct timeeval
     //long int tv_usec
-    //The number of microseconds elapsed since the time given by the tv_sec member.
+    //The number of microseconds elapsed since the time given by the tv_sec member->
 struct timeval end; // quando o filho termina de executar
     
 char nome[300];
@@ -25,7 +25,7 @@ char nome[300];
 
 
 
-int main(int argc, char **argv){   //argc: numero de argumentos presentes no argv; //argv: argumentos passados na inicializaçao do programa (ex: ./client execute -u "...") 
+int main(int argc, char **argv){   //argc: numero de argumentos presentes no argv; //argv: argumentos passados na inicializaçao do programa (ex: ->/client execute -u "->->->") 
 
 //Verifica se o número de argumentos está correto
     if(argc!=2 && argc!=5){
@@ -33,21 +33,21 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         return -1;
     }
     //preenche tudo da mensagem
-    minfo mensagem;
-    mensagem.id = 0;
-    gettimeofday(&mensagem.start,NULL);
-    gettimeofday(&mensagem.end,NULL);
-    mensagem.execucao = "";
+    minfo mensagem = malloc(sizeof(struct minfo));
+    mensagem->id = 0;
+    gettimeofday(&mensagem->start,NULL);
+    gettimeofday(&mensagem->end,NULL);
+    mensagem->execucao = "";
     
 //Preenche a estrutura "mensagem" correspondente com o input
-    mensagem.pid = getpid();
-    mensagem.tipo = 0;
-    mensagem.custom = 0;
+    mensagem->pid = getpid();
+    mensagem->tipo = 0;
+    mensagem->custom = 0;
     
     if (argc == 2 &&  strcmp(argv[1],"status") == 1){
-        mensagem.operacao = 2;
-        mensagem.time = 0;
-        mensagem.nome = "status";
+        mensagem->operacao = 2;
+        mensagem->time = 0;
+        mensagem->nome = "status";
     
     }else{ // para ter a certeza que não há erros no input
         if((0 == strcmp(argv[1], "execute")) &&  
@@ -58,14 +58,14 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
             return -1;
         }
         
-        mensagem.time = atoi(argv[2]);
-        mensagem.operacao = strcmp(argv[3],"-u");
-        mensagem.nome = argv[4];
+        mensagem->time = atoi(argv[2]);
+        mensagem->operacao = strcmp(argv[3],"-u");
+        mensagem->nome = argv[4];
     }
 
 //Cria o FIFO do cliente para depois ler
     char fifoc_name[30];
-	sprintf(fifoc_name, CLIENT "%d", mensagem.pid);
+	sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
 	
     if(mkfifo(fifoc_name, 0666)==-1){
 		perror("erro ao criar o fifo");
@@ -82,10 +82,10 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
     int fifocliente_fd = open(fifoc_name, O_RDONLY);
 
 //Lê e processa a resposta do servidor
-    if(mensagem.operacao != 2){
+    if(mensagem->operacao != 2){
         read(fifocliente_fd, &mensagem, sizeof(struct minfo));
         char* output;
-        sprintf(output, "Task (id %d, pid %d) received", mensagem.id, mensagem.pid);
+        sprintf(output, "Task (id %d, pid %d) received", mensagem->id, mensagem->pid);
 
         write(1,output, strlen(output));
     

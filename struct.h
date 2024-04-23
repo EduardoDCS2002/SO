@@ -25,7 +25,7 @@ typedef struct minfo{
     struct timeval end; // quando o filho termina de executar
     char *execucao;
     char *nome;
-}minfo;
+}*minfo;
 
 /*
 Lista no servidor vai ser uma lista de minfo
