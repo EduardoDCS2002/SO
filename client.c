@@ -32,13 +32,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         perror("Wrong number of arguments!");
         return -1;
     }
-    //preenche tudo da mensagem
     minfo mensagem = malloc(sizeof(struct minfo));
-    mensagem->id = 0;
-    gettimeofday(&mensagem->start,NULL);
-    gettimeofday(&mensagem->end,NULL);
-    mensagem->execucao = "";
-    
 //Preenche a estrutura "mensagem" correspondente com o input
     mensagem->pid = getpid();
     mensagem->tipo = 0;
@@ -59,7 +53,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         }
         
         mensagem->time = atoi(argv[2]);
-        mensagem->operacao = strcmp(argv[3],"-u");
+        mensagem->operacao = (1 == strcmp(argv[3],"-u"));
         mensagem->nome = argv[4];
     }
 
@@ -75,7 +69,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 	int fifoserver_fd = open(SERVER, O_WRONLY);
 	
 //Escreve a mensagem no FIFO do servidor
-    write(fifoserver_fd,&mensagem, sizeof(struct minfo));
+    write(fifoserver_fd,&mensagem, 8);
 	close(fifoserver_fd);
 
 //Abre o FIFO do cliente para leitura
@@ -83,15 +77,18 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 
 //Lê e processa a resposta do servidor
     if(mensagem->operacao != 2){
-        read(fifocliente_fd, &mensagem, sizeof(struct minfo));
+        read(fifocliente_fd, &mensagem, 8);
         char* output;
         sprintf(output, "Task (id %d, pid %d) received", mensagem->id, mensagem->pid);
 
         write(1,output, strlen(output));
     
     }else{
-        char statusoutput[512];
-        read(fifocliente_fd, &statusoutput, strlen(statusoutput));
+        char statusoutput[4096];
+        int bytes_read;
+        while(bytes_read>0){
+            bytes_read = read(fifocliente_fd, &statusoutput, 128);
+        }
         write(1,statusoutput, strlen(statusoutput));
     }
     
