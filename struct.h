@@ -23,8 +23,8 @@ typedef struct minfo{
     int custom; // para a política de escalonamento CUSTOM
     struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
     struct timeval end; // quando o filho termina de executar
-    char *execucao;
-    char *nome;
+    char execucao[300];
+    char nome[300];
 }*minfo;
 
 /*

@@ -32,6 +32,7 @@ char* escritanooutput(minfo mensagem){
     char* realoutput;
     sprintf(realoutput, "TASK (id %d, pid %d) - TIME %d miliseconds - COMMAND %s - OUTPUT %s\n"
     , mensagem->id, mensagem->pid, mensagem->time, mensagem->nome, mensagem->execucao);
+    return realoutput;
 }
 
 //Funçao para implementar a politica de esclonamento
@@ -98,9 +99,8 @@ int main(int argc, char * argv[]){
     int countID = 1001; // id das mensagens
     int countPT = 0; // quantos processos estão a decorrer neste momento
     int countfila = 0; // quantos processos estão na fila
-    int sizefila = 10*N;
-    minfo filaEspera[sizefila];
-    minfo mensagem;
+    minfo filaEspera[10*N];
+    minfo mensagem = malloc(sizeof(struct minfo));
     
 //Cria o FIFO do servidor
     if(mkfifo(SERVER, 0666)==-1){
@@ -113,7 +113,7 @@ int main(int argc, char * argv[]){
 	printf("--- fifo do server aberto ---\n");
     
     while(1){
-	    int read_bytes = read(fifoserver_fd, &mensagem, 8); // não precisas de verificar se a mensagem
+	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // não precisas de verificar se a mensagem
                                                             // está correta porque isso é visto no cliente
         //Processa a mensagem recebida
         if(mensagem->tipo == 1){ //Se for uma tarefa a ser escrita no output
@@ -121,23 +121,23 @@ int main(int argc, char * argv[]){
             int pid = fork();
             if(pid==0){
                 char *output = "/output-folder/output";
-                int fdoutput = open(output, O_CREAT, O_WRONLY, O_TRUNC, 0666);
+                int fdoutput = open(output, O_CREAT, O_WRONLY, 0666);
                 char *realoutput = escritanooutput(mensagem);
                 write(fdoutput,realoutput,strlen(realoutput));
                 _exit(0);
             }
             if((countfila>0) && (countPT<N)){ // manda fazer um novo processo se tiver processos para fazer
                 int pf=0;
-                if(strcmp(sp, "SJF")){
+                if(0 == strcmp(sp, "SJF")){
                     pf = sc_SJF(&filaEspera, countfila);
                 }
-                if(strcmp(sp, "CUSTOM")){
+                if(0 == strcmp(sp, "CUSTOM")){
                     pf = sc_CUSTOM(&filaEspera, countfila);
                 }
                 mensagem = filaEspera[pf];
                 countfila--;
                 countPT++;
-                gettimeofday(&mensagem->start, NULL);
+                gettimeofday(&(mensagem->start), NULL);
                 if(mensagem->operacao == 1){ // -u é 1 comando só
                     int pid = fork();
                     if(pid==0){
@@ -154,14 +154,14 @@ int main(int argc, char * argv[]){
                             execlp(nome, nome, comando, NULL);
                             _exit(0);
                         }
-                        close(pipes[0]);
-                        read(pipes[1], mensagem->execucao, 300);
+                        close(pipes[1]);
+                        read(pipes[0], mensagem->execucao, 300);
                         mensagem->tipo = 1;
-                        gettimeofday(&mensagem->end, NULL);
+                        gettimeofday(&(mensagem->end), NULL);
                         mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
                         int fifoserver_fd = open(SERVER, O_WRONLY);
-                        write(fifoserver_fd,&mensagem, 8);
+                        write(fifoserver_fd,mensagem, sizeof(struct minfo));
                         close(fifoserver_fd);
                         _exit(0);
                     }
@@ -169,8 +169,8 @@ int main(int argc, char * argv[]){
                 if(mensagem->operacao == 0){ // -p vários comandos
                     int pidpai = fork();
                     if(pidpai==0){
-                        char *exec_comandos[N];
-                        char *string, *cmd, *tofree;
+                        char* exec_comandos[10];
+                        char *string, *cmd;
                         int rN=0;
                         cmd = strdup(mensagem->nome);
                         while((string = strsep(&cmd,"|"))!=NULL){
@@ -192,11 +192,12 @@ int main(int argc, char * argv[]){
                                     char *nome = strsep(&comando, " ");
                                     execlp(nome, nome, comando, NULL);
                                     _exit(0);
-                                } 
+                                }
+                                close(pipes[i][1]);
                             }
                             if(i==rN-1){
-                                int pidmeio = fork();
-                                if(pidmeio == 0){
+                                int pidfim = fork();
+                                if(pidfim == 0){
                                     dup2(pipes[i-1][0],0);
                                     close(pipes[i-1][0]);
                                     char *comando;
@@ -205,11 +206,11 @@ int main(int argc, char * argv[]){
                                     execlp(nome, nome, comando, NULL);
                                     _exit(0);
                                 }
-                                close(pipes[i-1][1]);
+                                close(pipes[i-1][0]);
                             }else{
                                 pipe(pipes[i]);
-                                int pid = fork();
-                                if(pid == 0){
+                                int pidmeio = fork();
+                                if(pidmeio == 0){
                                     close(pipes[i][0]);
                                     dup2(pipes[i-1][0],0);
                                     close(pipes[i-1][0]);
@@ -227,11 +228,11 @@ int main(int argc, char * argv[]){
                         }
                         read(1,mensagem->execucao,300);
                         mensagem->tipo = 1;
-                        gettimeofday(&mensagem->end, NULL);
+                        gettimeofday(&(mensagem->end), NULL);
                         mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
                         int fifoserver_fd = open(SERVER, O_WRONLY);
-                        write(fifoserver_fd,&mensagem, 8);
+                        write(fifoserver_fd,mensagem, sizeof(struct minfo));
                         close(fifoserver_fd);
                         _exit(0);
 
@@ -250,14 +251,15 @@ int main(int argc, char * argv[]){
                         pipe(pipes);
                         int pidfilho = fork();
                         if(pidfilho == 0){
-                            close(pipes[1]);
-                            dup2(pipes[0], 0);
-                            close(pipes[0]); 
+                            close(pipes[0]);
+                            dup2(pipes[1], 1);
+                            close(pipes[1]); 
                             execlp("cat", "cat", "/output-folder/output", NULL);
                             _exit(0);
                         }
+                        close(pipes[1]);
                         char outputstatus[4096];
-                        read(1, &outputstatus, 4096);
+                        read(pipes[0], &outputstatus, 4096);
 
                         char fifoc_name[30];
                         sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
@@ -273,7 +275,7 @@ int main(int argc, char * argv[]){
                         countfila++;
                         if(countfila==1){
                             countfila--;
-                            gettimeofday(&mensagem->start, NULL);
+                            gettimeofday(&(mensagem->start), NULL);
                             if(mensagem->operacao == 1){ // -u é 1 comando só
                                 int pid = fork();
                                 if(pid==0){
@@ -281,23 +283,23 @@ int main(int argc, char * argv[]){
                                     pipe(pipes);
                                     int pidfilho = fork();
                                     if(pidfilho==0){
-                                        close(pipes[1]);
-                                        dup2(pipes[0],0);
                                         close(pipes[0]);
+                                        dup2(pipes[1],1);
+                                        close(pipes[1]);
                                         char *comando;
                                         comando = strdup(mensagem->nome);
                                         char *nome = strsep(&comando, " ");
                                         execlp(nome, nome, comando, NULL);
                                         _exit(0);
                                     }
-                                    close(pipes[0]);
-                                    read(pipes[1], mensagem->execucao, 300);
+                                    close(pipes[1]);
+                                    read(pipes[0], mensagem->execucao, 300);
                                     mensagem->tipo = 1;
-                                    gettimeofday(&mensagem->end, NULL);
+                                    gettimeofday(&(mensagem->end), NULL);
                                     mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
                                     int fifoserver_fd = open(SERVER, O_WRONLY);
-                                    write(fifoserver_fd,&mensagem, 8);
+                                    write(fifoserver_fd,mensagem, sizeof(struct minfo));
                                     close(fifoserver_fd);
                                     _exit(0);
                                 }
@@ -305,8 +307,8 @@ int main(int argc, char * argv[]){
                             if(mensagem->operacao == 0){ // -p vários comandos
                                 int pidpai = fork();
                                 if(pidpai==0){
-                                    char *exec_comandos[N];
-                                    char *string, *cmd, *tofree;
+                                    char* exec_comandos[10];
+                                    char *string, *cmd;
                                     int rN=0;
                                     cmd = strdup(mensagem->nome);
                                     while((string = strsep(&cmd,"|"))!=NULL){
@@ -328,7 +330,8 @@ int main(int argc, char * argv[]){
                                                 char *nome = strsep(&comando, " ");
                                                 execlp(nome, nome, comando, NULL);
                                                 _exit(0);
-                                            } 
+                                            }
+                                            close(pipes[i][1]);
                                         }
                                         if(i==rN-1){
                                             int pidfim = fork();
@@ -341,7 +344,7 @@ int main(int argc, char * argv[]){
                                                 execlp(nome, nome, comando, NULL);
                                                 _exit(0);
                                             }
-                                            close(pipes[i-1][1]);
+                                            close(pipes[i-1][0]);
                                         }else{
                                             pipe(pipes[i]);
                                             int pidmeio = fork();
@@ -361,14 +364,13 @@ int main(int argc, char * argv[]){
                                             close(pipes[i][1]);
                                         }
                                     }
-
                                     read(1,mensagem->execucao,300);
                                     mensagem->tipo = 1;
-                                    gettimeofday(&mensagem->end, NULL);
+                                    gettimeofday(&(mensagem->end), NULL);
                                     mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
                                     int fifoserver_fd = open(SERVER, O_WRONLY);
-                                    write(fifoserver_fd,&mensagem, 8);
+                                    write(fifoserver_fd,mensagem, sizeof(struct minfo));
                                     close(fifoserver_fd);
                                     _exit(0);
 

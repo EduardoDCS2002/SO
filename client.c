@@ -38,15 +38,14 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
     mensagem->tipo = 0;
     mensagem->custom = 0;
     
-    if (argc == 2 &&  strcmp(argv[1],"status") == 1){
+    if (argc == 2 &&  (strcmp(argv[1],"status") == 0)){
         mensagem->operacao = 2;
         mensagem->time = 0;
-        mensagem->nome = "status";
-    
+
     }else{ // para ter a certeza que não há erros no input
-        if((0 == strcmp(argv[1], "execute")) &&  
-        ((0 == strcmp(argv[3],"-u")) || (0 == strcmp(argv[3], "-p"))) &&
-        (0 ==atoi(argv[2])>0)){ //verificar o argv[4] no server
+        if(!(0 == strcmp(argv[1], "execute")) &&  
+        (!(0 == strcmp(argv[3],"-u")) || !(0 == strcmp(argv[3], "-p"))) &&
+        atoi(argv[2])<=0){ //verificar o argv[4] no server
             
             perror("Arguments don't have the correct values!");
             return -1;
@@ -54,7 +53,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         
         mensagem->time = atoi(argv[2]);
         mensagem->operacao = (1 == strcmp(argv[3],"-u"));
-        mensagem->nome = argv[4];
+        sprintf(mensagem->nome, argv[4]);
     }
 
 //Cria o FIFO do cliente para depois ler
@@ -69,7 +68,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 	int fifoserver_fd = open(SERVER, O_WRONLY);
 	
 //Escreve a mensagem no FIFO do servidor
-    write(fifoserver_fd,&mensagem, 8);
+    write(fifoserver_fd,mensagem, sizeof(struct minfo));
 	close(fifoserver_fd);
 
 //Abre o FIFO do cliente para leitura
@@ -77,7 +76,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 
 //Lê e processa a resposta do servidor
     if(mensagem->operacao != 2){
-        read(fifocliente_fd, &mensagem, 8);
+        read(fifocliente_fd, mensagem, sizeof(struct minfo));
         char* output;
         sprintf(output, "Task (id %d, pid %d) received", mensagem->id, mensagem->pid);
 
