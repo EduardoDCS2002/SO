@@ -25,7 +25,7 @@ char nome[300];
 
 
 
-int main(int argc, char **argv){   //argc: numero de argumentos presentes no argv; //argv: argumentos passados na inicializaçao do programa (ex: ->/client execute -u "->->->") 
+int main(int argc, char *argv[]){   //argc: numero de argumentos presentes no argv; //argv: argumentos passados na inicializaçao do programa (ex: ->/client execute -u "->->->") 
 
 //Verifica se o número de argumentos está correto
     if(argc!=2 && argc!=5){
@@ -43,8 +43,8 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         mensagem->time = 0;
 
     }else{ // para ter a certeza que não há erros no input
-        if(!(0 == strcmp(argv[1], "execute")) &&  
-        (!(0 == strcmp(argv[3],"-u")) || !(0 == strcmp(argv[3], "-p"))) &&
+        if((0 != strcmp(argv[1], "execute")) &&  
+        ((0 != strcmp(argv[3],"-u")) || (0 != strcmp(argv[3], "-p"))) &&
         atoi(argv[2])<=0){ //verificar o argv[4] no server
             
             perror("Arguments don't have the correct values!");
@@ -52,7 +52,11 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         }
         
         mensagem->time = atoi(argv[2]);
-        mensagem->operacao = (1 == strcmp(argv[3],"-u"));
+        if(0 == strcmp(argv[3],"-u")){
+            mensagem->operacao = 1;
+        }else{
+            mensagem->operacao = 0;
+        }
         sprintf(mensagem->nome, argv[4]);
     }
 
@@ -66,19 +70,20 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
 	}
 
 	int fifoserver_fd = open(SERVER, O_WRONLY);
-	
+	printf("--- abriu o fifo do server ---\n");
 //Escreve a mensagem no FIFO do servidor
     write(fifoserver_fd,mensagem, sizeof(struct minfo));
+    printf("--- escreveu no fifo do server ---\n");
 	close(fifoserver_fd);
 
 //Abre o FIFO do cliente para leitura
     int fifocliente_fd = open(fifoc_name, O_RDONLY);
-
+    printf("--- abriu o próprio fifo ---\n");
 //Lê e processa a resposta do servidor
     if(mensagem->operacao != 2){
         read(fifocliente_fd, mensagem, sizeof(struct minfo));
         char* output;
-        sprintf(output, "Task (id %d, pid %d) received", mensagem->id, mensagem->pid);
+        sprintf(output, "Task (id %d, pid %d) received\n", mensagem->id, mensagem->pid);
 
         write(1,output, strlen(output));
     
@@ -90,6 +95,7 @@ int main(int argc, char **argv){   //argc: numero de argumentos presentes no arg
         }
         write(1,statusoutput, strlen(statusoutput));
     }
+    printf("--- acabou de ler o que veio do server ---\n");
     
     unlink(fifoc_name);
     return 0;

@@ -11,7 +11,7 @@
 #define SERVER "fifo_server" 
 #define CLIENT "fifo_client"
 #define sizeExecute 300
-#define OUTPUT "/output-folder/"
+#define OUTPUT "output-folder/output"
 
 typedef struct minfo{
     int id;

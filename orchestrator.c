@@ -9,14 +9,7 @@
 //políticas de escalonamento: FCFS, SJF e custom
 //sempre que um cliente entrar em contacto, incrementar 1 e retornar
 // gettimeofday(&timeval, NULL);
-int mensagemrecebida(int id, minfo queue[], int tam){
-    for(int i=0; i<tam; i++){
-        if(queue[i]->id == id){
-            return 1;
-        }
-    }
-    return 0;
-}
+
 void swapminfo(minfo a, minfo b){
     minfo tmp;
     *tmp = *a;
@@ -30,7 +23,8 @@ long int time_diff(struct timeval *start, struct timeval *end) {
 char* escritanooutput(minfo mensagem){
     // id, pid, time, nome, execucao
     char* realoutput;
-    sprintf(realoutput, "TASK (id %d, pid %d) - TIME %d miliseconds - COMMAND %s - OUTPUT %s\n"
+    sprintf(realoutput, 
+    "------------------\nTASK (id %d, pid %d)\n   TIME %d miliseconds\n   COMMAND %s\n   OUTPUT %s\n------------------"
     , mensagem->id, mensagem->pid, mensagem->time, mensagem->nome, mensagem->execucao);
     return realoutput;
 }
@@ -79,7 +73,7 @@ int main(int argc, char * argv[]){
     // Verifica os argumentos passados
     int N = atoi(argv[2]);
     char* sp = argv[3];
-    if((0 == strcmp(argv[1],OUTPUT))){
+    if((0 != strcmp(argv[1],"output-folder"))){
         perror("erro no input");
         return -1;
     }
@@ -87,9 +81,9 @@ int main(int argc, char * argv[]){
         perror("erro no input");
         return -1;
     }    
-    if(0 == (strcmp(sp, "FCFS"))){
-        if(0 == (strcmp(sp, "SJF"))){
-            if(0 == (strcmp(sp, "CUSTOM"))){
+    if(0 != (strcmp(sp, "FCFS"))){
+        if(0 != (strcmp(sp, "SJF"))){
+            if(0 != (strcmp(sp, "CUSTOM"))){
                 perror("erro no input");
                 return -1;
             }
@@ -101,29 +95,31 @@ int main(int argc, char * argv[]){
     int countfila = 0; // quantos processos estão na fila
     minfo filaEspera[10*N];
     minfo mensagem = malloc(sizeof(struct minfo));
-    
 //Cria o FIFO do servidor
     if(mkfifo(SERVER, 0666)==-1){
 		perror("erro ao criar o fifo");
 		return -1;
 	}
 
-	printf("--- fifo do server e do escritor criado ---\n");
-    int fifoserver_fd = open(SERVER, O_RDONLY);
+	printf("--- fifo do server criado ---\n");
+    int fifoserver_fd = open(SERVER, O_RDWR);
 	printf("--- fifo do server aberto ---\n");
     
     while(1){
+        printf("começa o read\n");
 	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // não precisas de verificar se a mensagem
                                                             // está correta porque isso é visto no cliente
         //Processa a mensagem recebida
+        printf("acaba o read");
+        printf("quantos bytes %d", read_bytes);
         if(mensagem->tipo == 1){ //Se for uma tarefa a ser escrita no output
             countPT--;
             int pid = fork();
             if(pid==0){
-                char *output = "/output-folder/output";
-                int fdoutput = open(output, O_CREAT, O_WRONLY, 0666);
+                int fdoutput = open(OUTPUT, O_CREAT, O_RDWR);
                 char *realoutput = escritanooutput(mensagem);
                 write(fdoutput,realoutput,strlen(realoutput));
+                close(fdoutput);
                 _exit(0);
             }
             if((countfila>0) && (countPT<N)){ // manda fazer um novo processo se tiver processos para fazer
@@ -195,7 +191,7 @@ int main(int argc, char * argv[]){
                                 }
                                 close(pipes[i][1]);
                             }
-                            if(i==rN-1){
+                            else if(i==rN-1){
                                 int pidfim = fork();
                                 if(pidfim == 0){
                                     dup2(pipes[i-1][0],0);
@@ -240,8 +236,8 @@ int main(int argc, char * argv[]){
                 }
             }
         
-        }else{ //Se for uma tarefa a ser escalonada
-            if(0 == mensagemrecebida(mensagem->id, filaEspera, countfila)){
+        }else if(mensagem->tipo!=1){ //Se for uma tarefa a ser escalonada
+            if(mensagem->tipo == 0){
                 printf("--- mensagem lida ---\n");
                 if(mensagem->operacao == 2){ //status -- cat do output
                     int pid = fork();
@@ -254,7 +250,7 @@ int main(int argc, char * argv[]){
                             close(pipes[0]);
                             dup2(pipes[1], 1);
                             close(pipes[1]); 
-                            execlp("cat", "cat", "/output-folder/output", NULL);
+                            execlp("cat", "cat", OUTPUT, NULL);
                             _exit(0);
                         }
                         close(pipes[1]);
@@ -271,6 +267,14 @@ int main(int argc, char * argv[]){
                     if((mensagem->operacao == 1)||(mensagem->operacao == 0)){
                         mensagem->id = countID;
                         countID++;
+                        int pidparacliente = fork();
+                        //avisa o cliente que já recebeu a mensagem
+                        if(pidparacliente==0){
+                            char fifoc_name[30];
+                            sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
+                            int fifocliente_fd = open(fifoc_name, O_WRONLY);
+                            write(fifocliente_fd, mensagem, sizeof(struct minfo));
+                        }
                         filaEspera[countfila] = mensagem;
                         countfila++;
                         if(countfila==1){
@@ -332,8 +336,7 @@ int main(int argc, char * argv[]){
                                                 _exit(0);
                                             }
                                             close(pipes[i][1]);
-                                        }
-                                        if(i==rN-1){
+                                        }else if(i==rN-1){
                                             int pidfim = fork();
                                             if(pidfim == 0){
                                                 dup2(pipes[i-1][0],0);
@@ -382,5 +385,6 @@ int main(int argc, char * argv[]){
             }
         }
     }
+    unlink(SERVER);
     return 0;
 }
