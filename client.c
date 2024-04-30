@@ -37,6 +37,7 @@ int main(int argc, char *argv[]){   //argc: numero de argumentos presentes no ar
     mensagem->pid = getpid();
     mensagem->tipo = 0;
     mensagem->custom = 0;
+    //mensagem->id = 0;
     
     if (argc == 2 &&  (strcmp(argv[1],"status") == 0)){
         mensagem->operacao = 2;
@@ -82,17 +83,15 @@ int main(int argc, char *argv[]){   //argc: numero de argumentos presentes no ar
 //Lê e processa a resposta do servidor
     if(mensagem->operacao != 2){
         read(fifocliente_fd, mensagem, sizeof(struct minfo));
-        char* output;
+        char output[128];
         sprintf(output, "Task (id %d, pid %d) received\n", mensagem->id, mensagem->pid);
 
         write(1,output, strlen(output));
     
-    }else{
+    }else if(mensagem->operacao == 2){
         char statusoutput[4096];
-        int bytes_read;
-        while(bytes_read>0){
-            bytes_read = read(fifocliente_fd, &statusoutput, 128);
-        }
+        read(fifocliente_fd, &statusoutput, 4096);
+        strcat(statusoutput, "\n");
         write(1,statusoutput, strlen(statusoutput));
     }
     printf("--- acabou de ler o que veio do server ---\n");

@@ -104,19 +104,28 @@ int main(int argc, char * argv[]){
 	printf("--- fifo do server criado ---\n");
     int fifoserver_fd = open(SERVER, O_RDWR);
 	printf("--- fifo do server aberto ---\n");
-    
+    //filho que vai parar o programa se escrever stop no input
+    int pidstop = fork();
+    if(pidstop==0){
+        char* stop = "notstop";
+        while(strcmp(stop,"stop")!=0){
+            read(0, stop, 4);
+        }
+        unlink(SERVER);
+        return 0;
+    }
     while(1){
         printf("começa o read\n");
 	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // não precisas de verificar se a mensagem
                                                             // está correta porque isso é visto no cliente
         //Processa a mensagem recebida
-        printf("acaba o read");
-        printf("quantos bytes %d", read_bytes);
+        printf("acaba o read\n");
+        printf("quantos bytes %d\n", read_bytes);
         if(mensagem->tipo == 1){ //Se for uma tarefa a ser escrita no output
             countPT--;
             int pid = fork();
             if(pid==0){
-                int fdoutput = open(OUTPUT, O_CREAT, O_RDWR);
+                int fdoutput = open(OUTPUT, O_CREAT, O_WRONLY);
                 char *realoutput = escritanooutput(mensagem);
                 write(fdoutput,realoutput,strlen(realoutput));
                 close(fdoutput);
@@ -249,8 +258,10 @@ int main(int argc, char * argv[]){
                         if(pidfilho == 0){
                             close(pipes[0]);
                             dup2(pipes[1], 1);
-                            close(pipes[1]); 
+                            close(pipes[1]);
+                            int fdoutput = open(OUTPUT, O_CREAT, O_RDONLY);
                             execlp("cat", "cat", OUTPUT, NULL);
+                            close(fdoutput);
                             _exit(0);
                         }
                         close(pipes[1]);
@@ -277,7 +288,15 @@ int main(int argc, char * argv[]){
                         }
                         filaEspera[countfila] = mensagem;
                         countfila++;
-                        if(countfila==1){
+                        if((countfila>0) && (countPT<N)){ // manda fazer um novo processo se tiver processos para fazer
+                            int pf=0;
+                            if(0 == strcmp(sp, "SJF")){
+                                pf = sc_SJF(&filaEspera, countfila);
+                            }
+                            if(0 == strcmp(sp, "CUSTOM")){
+                                pf = sc_CUSTOM(&filaEspera, countfila);
+                            }
+                            mensagem = filaEspera[pf];
                             countfila--;
                             gettimeofday(&(mensagem->start), NULL);
                             if(mensagem->operacao == 1){ // -u é 1 comando só
