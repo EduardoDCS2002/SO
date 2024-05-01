@@ -10,8 +10,8 @@
 
 #define SERVER "fifo_server" 
 #define CLIENT "fifo_client"
-#define sizeExecute 300
-#define OUTPUT "output-folder/output"
+#define sizeExecute 301
+#define OUTPUT "/home/edulinux/SO-1/output-folder/output"
 
 typedef struct minfo{
     int id;
@@ -23,8 +23,8 @@ typedef struct minfo{
     int custom; // para a política de escalonamento CUSTOM
     struct timeval start; //tempo de inicio atualizar o valor quando chega ao servidor
     struct timeval end; // quando o filho termina de executar
-    char execucao[300];
-    char nome[300];
+    char execucao[sizeExecute];
+    char nome[sizeExecute];
 }*minfo;
 
 /*

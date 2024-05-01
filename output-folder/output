@@ -1,0 +1,73 @@
+------------------
+TASK (id 1006, pid 40800)
+   TIME 0 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:11 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:12 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:11 orchestrator
+
+------------------------------------
+TASK (id 1001, pid 43720)
+   TIME 2 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------------------------
+TASK (id 1002, pid 43740)
+   TIME 1 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------------------------
+TASK (id 1003, pid 43758)
+   TIME 1 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------------------------
+TASK (id 1004, pid 43774)
+   TIME 0 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------------------------
+TASK (id 1001, pid 45497)
+   TIME 1 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:23 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------------------------
+TASK (id 1002, pid 45513)
+   TIME 1 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:23 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------------------------
+TASK (id 1003, pid 45529)
+   TIME 2 miliseconds
+   COMMAND ls -l
+   OUTPUT total 48
+-rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
+prw-r--r-- 1 edulinux edulinux     0 May  1 15:23 fifo_server
+-rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+
+------------------

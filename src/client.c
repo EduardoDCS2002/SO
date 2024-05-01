@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){   //argc: numero de argumentos presentes no ar
 		return -1;
 	}
 
-	int fifoserver_fd = open(SERVER, O_WRONLY);
+	int fifoserver_fd = open(SERVER, O_WRONLY, 0666);
 	printf("--- abriu o fifo do server ---\n");
 //Escreve a mensagem no FIFO do servidor
     write(fifoserver_fd,mensagem, sizeof(struct minfo));
@@ -78,12 +78,12 @@ int main(int argc, char *argv[]){   //argc: numero de argumentos presentes no ar
 	close(fifoserver_fd);
 
 //Abre o FIFO do cliente para leitura
-    int fifocliente_fd = open(fifoc_name, O_RDONLY);
+    int fifocliente_fd = open(fifoc_name, O_RDONLY, 0666);
     printf("--- abriu o próprio fifo ---\n");
 //Lê e processa a resposta do servidor
     if(mensagem->operacao != 2){
         read(fifocliente_fd, mensagem, sizeof(struct minfo));
-        char output[128];
+        char output[64];
         sprintf(output, "Task (id %d, pid %d) received\n", mensagem->id, mensagem->pid);
 
         write(1,output, strlen(output));

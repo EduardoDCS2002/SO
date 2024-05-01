@@ -22,7 +22,7 @@ long int time_diff(struct timeval *start, struct timeval *end) {
 
 char* escritanooutput(minfo mensagem){
     // id, pid, time, nome, execucao
-    char* realoutput;
+    char* realoutput = malloc(sizeExecute * sizeof(char)); // chad põe sempre o sizeof!!!
     sprintf(realoutput, 
     "------------------\nTASK (id %d, pid %d)\n   TIME %d miliseconds\n   COMMAND %s\n   OUTPUT %s\n------------------"
     , mensagem->id, mensagem->pid, mensagem->time, mensagem->nome, mensagem->execucao);
@@ -102,22 +102,30 @@ int main(int argc, char * argv[]){
 	}
 
 	printf("--- fifo do server criado ---\n");
-    int fifoserver_fd = open(SERVER, O_RDWR);
+    int fifoserver_fd = open(SERVER, O_RDWR, 0666);
 	printf("--- fifo do server aberto ---\n");
     //filho que vai parar o programa se escrever stop no input
+    int pipedostop[2];
+    pipe(pipedostop);
     int pidstop = fork();
     if(pidstop==0){
-        char* stop = "notstop";
+        char stop[5] = "nstp";
         while(strcmp(stop,"stop")!=0){
             read(0, stop, 4);
         }
-        unlink(SERVER);
-        return 0;
+        minfo mensagemstop = malloc(sizeof(struct minfo));
+        mensagemstop->pid = 0;
+        write(fifoserver_fd, mensagemstop, sizeof(struct minfo));
+        _exit(0);
     }
     while(1){
         printf("começa o read\n");
 	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // não precisas de verificar se a mensagem
                                                             // está correta porque isso é visto no cliente
+        if(mensagem->pid == 0){
+            unlink(SERVER);
+            return 0;
+        }
         //Processa a mensagem recebida
         printf("acaba o read\n");
         printf("quantos bytes %d\n", read_bytes);
@@ -125,8 +133,9 @@ int main(int argc, char * argv[]){
             countPT--;
             int pid = fork();
             if(pid==0){
-                int fdoutput = open(OUTPUT, O_CREAT, O_WRONLY);
-                char *realoutput = escritanooutput(mensagem);
+                int fdoutput = open(OUTPUT, O_CREAT|O_APPEND|O_WRONLY, 0777);
+                char *realoutput;
+                realoutput = escritanooutput(mensagem);
                 write(fdoutput,realoutput,strlen(realoutput));
                 close(fdoutput);
                 _exit(0);
@@ -160,12 +169,12 @@ int main(int argc, char * argv[]){
                             _exit(0);
                         }
                         close(pipes[1]);
-                        read(pipes[0], mensagem->execucao, 300);
+                        read(pipes[0], mensagem->execucao, sizeExecute);
                         mensagem->tipo = 1;
                         gettimeofday(&(mensagem->end), NULL);
                         mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
-                        int fifoserver_fd = open(SERVER, O_WRONLY);
+                        int fifoserver_fd = open(SERVER, O_WRONLY, 0666);
                         write(fifoserver_fd,mensagem, sizeof(struct minfo));
                         close(fifoserver_fd);
                         _exit(0);
@@ -231,12 +240,12 @@ int main(int argc, char * argv[]){
                                 close(pipes[i][1]);
                             }
                         }
-                        read(1,mensagem->execucao,300);
+                        read(1,mensagem->execucao,sizeExecute);
                         mensagem->tipo = 1;
                         gettimeofday(&(mensagem->end), NULL);
                         mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
-                        int fifoserver_fd = open(SERVER, O_WRONLY);
+                        int fifoserver_fd = open(SERVER, O_WRONLY, 0666);
                         write(fifoserver_fd,mensagem, sizeof(struct minfo));
                         close(fifoserver_fd);
                         _exit(0);
@@ -259,7 +268,7 @@ int main(int argc, char * argv[]){
                             close(pipes[0]);
                             dup2(pipes[1], 1);
                             close(pipes[1]);
-                            int fdoutput = open(OUTPUT, O_CREAT, O_RDONLY);
+                            int fdoutput = open(OUTPUT, O_CREAT|O_RDONLY, 0666);
                             execlp("cat", "cat", OUTPUT, NULL);
                             close(fdoutput);
                             _exit(0);
@@ -270,7 +279,7 @@ int main(int argc, char * argv[]){
 
                         char fifoc_name[30];
                         sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
-                        int fifocliente_fd = open(fifoc_name, O_WRONLY);
+                        int fifocliente_fd = open(fifoc_name, O_WRONLY, 0666);
                         write(fifocliente_fd, &outputstatus, strlen(outputstatus));
                         _exit(0);
                     }
@@ -283,8 +292,9 @@ int main(int argc, char * argv[]){
                         if(pidparacliente==0){
                             char fifoc_name[30];
                             sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
-                            int fifocliente_fd = open(fifoc_name, O_WRONLY);
+                            int fifocliente_fd = open(fifoc_name, O_WRONLY, 0666);
                             write(fifocliente_fd, mensagem, sizeof(struct minfo));
+                            _exit(0);
                         }
                         filaEspera[countfila] = mensagem;
                         countfila++;
@@ -316,12 +326,12 @@ int main(int argc, char * argv[]){
                                         _exit(0);
                                     }
                                     close(pipes[1]);
-                                    read(pipes[0], mensagem->execucao, 300);
+                                    read(pipes[0], mensagem->execucao, sizeExecute);
                                     mensagem->tipo = 1;
                                     gettimeofday(&(mensagem->end), NULL);
                                     mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
-                                    int fifoserver_fd = open(SERVER, O_WRONLY);
+                                    int fifoserver_fd = open(SERVER, O_WRONLY, 0666);
                                     write(fifoserver_fd,mensagem, sizeof(struct minfo));
                                     close(fifoserver_fd);
                                     _exit(0);
@@ -386,12 +396,12 @@ int main(int argc, char * argv[]){
                                             close(pipes[i][1]);
                                         }
                                     }
-                                    read(1,mensagem->execucao,300);
+                                    read(1,mensagem->execucao,sizeExecute);
                                     mensagem->tipo = 1;
                                     gettimeofday(&(mensagem->end), NULL);
                                     mensagem->time = time_diff(&mensagem->start, &mensagem->end);
 
-                                    int fifoserver_fd = open(SERVER, O_WRONLY);
+                                    int fifoserver_fd = open(SERVER, O_WRONLY, 0666);
                                     write(fifoserver_fd,mensagem, sizeof(struct minfo));
                                     close(fifoserver_fd);
                                     _exit(0);
