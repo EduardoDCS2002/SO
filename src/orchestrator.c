@@ -1,13 +1,12 @@
 #include "struct.h"
 
-
-// forma de correr o orchestrator
+// Forma de correr o orchestrator
 // ->/orchestrator output_folder parallel-tasks sched-policy
 // sendo output_folder para onde vão os ficheiros das tarefas feitas executadas,
 // parallel-tasks o máximo de tarefas a serem corridas em paralelo,
 // a sched policy a política de escalonamento(vamos tentar fazer pelo menos 3)
-//políticas de escalonamento: FCFS, SJF e custom
-//sempre que um cliente entrar em contacto, incrementar 1 e retornar
+// políticas de escalonamento: FCFS, SJF e CUSTOM
+// sempre que um cliente entrar em contacto, incrementar 1 e retornar
 // gettimeofday(&timeval, NULL);
 
 void swapminfo(minfo a, minfo b){
@@ -21,25 +20,27 @@ long int time_diff(struct timeval *start, struct timeval *end) {
 }
 
 char* escritanooutput(minfo mensagem){
-    // id, pid, time, nome, execucao
-    char* realoutput = malloc(sizeExecute * sizeof(char)); // chad põe sempre o sizeof!!!
+    // Formata a mensagem de saída para escrever no ficheiro de output
+    char* realoutput = malloc(128 + sizeExecute * sizeof(char));
     sprintf(realoutput, 
-    "------------------\nTASK (id %d, pid %d)\n   TIME %d miliseconds\n   COMMAND %s\n   OUTPUT %s\n------------------"
+    "------------------\n  TASK (id %d, pid %d)\n   TIME %d miliseconds\n   COMMAND %s\n   OUTPUT %s\n------------------\n"
     , mensagem->id, mensagem->pid, mensagem->time, mensagem->nome, mensagem->execucao);
     return realoutput;
 }
 
-//Funçao para implementar a politica de esclonamento
+// Função para implementar a politica de esclonamento SJF
 int sc_SJF(minfo (*fila)[], int N){
     int menor_tempo = (*fila)[0]->time;
     int indice_menor_tempo = 0;
-
+    // Procura a tarefa com o menor tempo
     for (int i = 1; i< N; i++){
         if((*fila)[i]->time < menor_tempo){
             menor_tempo = (*fila)[i]->time;
             indice_menor_tempo = i;
         }
     }
+    
+    // Move a tarefa com menor tempo para o final da fila
     for(int i=indice_menor_tempo;i<N-1;i++){
         swapminfo((*fila)[i],(*fila)[i+1]);
     }
@@ -47,10 +48,12 @@ int sc_SJF(minfo (*fila)[], int N){
     return indice_menor_tempo;
 }
 
-//Funçao para implementar uma politica de escalonamento
+// Função para implementar uma politica de escalonamento CUSTOM
 int sc_CUSTOM(minfo (*fila)[], int N){ // se um gajo for ultrapassado, o mensagem->custom dele soma 1
     int menor_tempo = (*fila)[0]->time; // se o mensagem->custom dele chegar a 3, ele é o escolhido->
     int indice_escolhido = 0;
+    
+    // Procura a tarefa com o menor tempo
     for (int i = 0; i< N; i++){
         if((*fila)[i]->custom >=3){
             indice_escolhido = i;
@@ -62,6 +65,8 @@ int sc_CUSTOM(minfo (*fila)[], int N){ // se um gajo for ultrapassado, o mensage
             }
         }
     }
+    
+    // Move a tarefa com menor tempo para o final da fila
     for(int i=indice_escolhido;i<N-1;i++){
         swapminfo((*fila)[i],(*fila)[i+1]);
     }
@@ -70,41 +75,45 @@ int sc_CUSTOM(minfo (*fila)[], int N){ // se um gajo for ultrapassado, o mensage
 }
 
 int main(int argc, char * argv[]){
+    
     // Verifica os argumentos passados
     int N = atoi(argv[2]);
     char* sp = argv[3];
     if((0 != strcmp(argv[1],"output-folder"))){
-        perror("erro no input");
+        perror("Erro no input");
         return -1;
     }
     if(N<0){
-        perror("erro no input");
+        perror("Erro no input");
         return -1;
     }    
     if(0 != (strcmp(sp, "FCFS"))){
         if(0 != (strcmp(sp, "SJF"))){
             if(0 != (strcmp(sp, "CUSTOM"))){
-                perror("erro no input");
+                perror("Erro no input");
                 return -1;
             }
         }
     }
-//Inicializa variáveis
+
+    // Inicializa variáveis
     int countID = 1001; // id das mensagens
     int countPT = 0; // quantos processos estão a decorrer neste momento
     int countfila = 0; // quantos processos estão na fila
     minfo filaEspera[10*N];
     minfo mensagem = malloc(sizeof(struct minfo));
-//Cria o FIFO do servidor
+
+    // Cria o FIFO do servidor
     if(mkfifo(SERVER, 0666)==-1){
-		perror("erro ao criar o fifo");
+		perror("Erro ao criar o fifo");
 		return -1;
 	}
 
-	printf("--- fifo do server criado ---\n");
+	printf("--- Fifo do server criado ---\n");
     int fifoserver_fd = open(SERVER, O_RDWR, 0666);
-	printf("--- fifo do server aberto ---\n");
-    //filho que vai parar o programa se escrever stop no input
+	printf("--- Fifo do server aberto ---\n");
+
+    // Filho que vai parar o programa se escrever stop no input
     int pipedostop[2];
     pipe(pipedostop);
     int pidstop = fork();
@@ -119,17 +128,18 @@ int main(int argc, char * argv[]){
         _exit(0);
     }
     while(1){
-        printf("começa o read\n");
-	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // não precisas de verificar se a mensagem
-                                                            // está correta porque isso é visto no cliente
+        printf("Começa o read\n");
+	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // Não precisas de verificar se a mensagem
+                                                                              //está correta porque isso é visto no cliente
         if(mensagem->pid == 0){
             unlink(SERVER);
             return 0;
         }
-        //Processa a mensagem recebida
-        printf("acaba o read\n");
-        printf("quantos bytes %d\n", read_bytes);
-        if(mensagem->tipo == 1){ //Se for uma tarefa a ser escrita no output
+        
+        // Processa a mensagem recebida
+        printf("Acaba o read\n");
+        printf("Quantos bytes li: %d\n", read_bytes);
+        if(mensagem->tipo == 1){ // Se for uma tarefa a ser escrita no output
             countPT--;
             int pid = fork();
             if(pid==0){
@@ -140,7 +150,7 @@ int main(int argc, char * argv[]){
                 close(fdoutput);
                 _exit(0);
             }
-            if((countfila>0) && (countPT<N)){ // manda fazer um novo processo se tiver processos para fazer
+            if((countfila>0) && (countPT<N)){ // Manda fazer um novo processo se tiver processos para fazer
                 int pf=0;
                 if(0 == strcmp(sp, "SJF")){
                     pf = sc_SJF(&filaEspera, countfila);
@@ -151,7 +161,6 @@ int main(int argc, char * argv[]){
                 mensagem = filaEspera[pf];
                 countfila--;
                 countPT++;
-                gettimeofday(&(mensagem->start), NULL);
                 if(mensagem->operacao == 1){ // -u é 1 comando só
                     int pid = fork();
                     if(pid==0){
@@ -192,7 +201,7 @@ int main(int argc, char * argv[]){
                             rN++;
                         }
                         exec_comandos[rN]=NULL;
-                        int pipes[rN-1][2];
+                        int pipes[rN][2];
                         for(int i=0;i<rN;i++){
                             if(i==0){
                                 pipe(pipes[i]);
@@ -214,6 +223,8 @@ int main(int argc, char * argv[]){
                                 if(pidfim == 0){
                                     dup2(pipes[i-1][0],0);
                                     close(pipes[i-1][0]);
+                                    dup2(pipes[i][1],1);
+                                    close(pipes[i][1]);
                                     char *comando;
                                     comando = strdup(exec_comandos[i]);
                                     char *nome = strsep(&comando, " ");
@@ -240,7 +251,7 @@ int main(int argc, char * argv[]){
                                 close(pipes[i][1]);
                             }
                         }
-                        read(1,mensagem->execucao,sizeExecute);
+                        read(pipes[rN][0],mensagem->execucao,sizeExecute);
                         mensagem->tipo = 1;
                         gettimeofday(&(mensagem->end), NULL);
                         mensagem->time = time_diff(&mensagem->start, &mensagem->end);
@@ -254,14 +265,14 @@ int main(int argc, char * argv[]){
                 }
             }
         
-        }else if(mensagem->tipo!=1){ //Se for uma tarefa a ser escalonada
+        }else if(mensagem->tipo!=1){ // Se for uma tarefa a ser escalonada
             if(mensagem->tipo == 0){
-                printf("--- mensagem lida ---\n");
-                if(mensagem->operacao == 2){ //status -- cat do output
+                printf("--- Mensagem lida ---\n");
+                if(mensagem->operacao == 2){ // status -- cat do output
                     int pid = fork();
                     
-                    if(pid == 0){ // o filho do filho vai executar e o filho vai mandar o
-                        int pipes[2]; // output diretamente para o cliente
+                    if(pid == 0){     // O filho do filho vai executar e o filho vai mandar o output diretamente para o cliente
+                        int pipes[2]; 
                         pipe(pipes);
                         int pidfilho = fork();
                         if(pidfilho == 0){
@@ -276,7 +287,7 @@ int main(int argc, char * argv[]){
                         close(pipes[1]);
                         char outputstatus[4096];
                         read(pipes[0], &outputstatus, 4096);
-
+                        
                         char fifoc_name[30];
                         sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
                         int fifocliente_fd = open(fifoc_name, O_WRONLY, 0666);
@@ -288,7 +299,8 @@ int main(int argc, char * argv[]){
                         mensagem->id = countID;
                         countID++;
                         int pidparacliente = fork();
-                        //avisa o cliente que já recebeu a mensagem
+                        
+                        // Avisa o cliente que já recebeu a mensagem
                         if(pidparacliente==0){
                             char fifoc_name[30];
                             sprintf(fifoc_name, CLIENT "%d", mensagem->pid);
@@ -296,9 +308,10 @@ int main(int argc, char * argv[]){
                             write(fifocliente_fd, mensagem, sizeof(struct minfo));
                             _exit(0);
                         }
+                        gettimeofday(&(mensagem->start), NULL);
                         filaEspera[countfila] = mensagem;
                         countfila++;
-                        if((countfila>0) && (countPT<N)){ // manda fazer um novo processo se tiver processos para fazer
+                        if((countfila>0) && (countPT<N)){ // Manda fazer um novo processo se tiver processos para fazer
                             int pf=0;
                             if(0 == strcmp(sp, "SJF")){
                                 pf = sc_SJF(&filaEspera, countfila);
@@ -308,8 +321,7 @@ int main(int argc, char * argv[]){
                             }
                             mensagem = filaEspera[pf];
                             countfila--;
-                            gettimeofday(&(mensagem->start), NULL);
-                            if(mensagem->operacao == 1){ // -u é 1 comando só
+                            if(mensagem->operacao == 1){ // -u é um comando só
                                 int pid = fork();
                                 if(pid==0){
                                     int pipes[2];
@@ -349,7 +361,7 @@ int main(int argc, char * argv[]){
                                         rN++;
                                     }
                                     exec_comandos[rN]=NULL;
-                                    int pipes[rN-1][2];
+                                    int pipes[rN][2];
                                     for(int i=0;i<rN;i++){
                                         if(i==0){
                                             pipe(pipes[i]);
@@ -370,6 +382,8 @@ int main(int argc, char * argv[]){
                                             if(pidfim == 0){
                                                 dup2(pipes[i-1][0],0);
                                                 close(pipes[i-1][0]);
+                                                dup2(pipes[i][1],1);
+                                                close(pipes[i][1]);
                                                 char *comando;
                                                 comando = strdup(exec_comandos[i]);
                                                 char *nome = strsep(&comando, " ");
@@ -396,7 +410,7 @@ int main(int argc, char * argv[]){
                                             close(pipes[i][1]);
                                         }
                                     }
-                                    read(1,mensagem->execucao,sizeExecute);
+                                    read(pipes[rN][0],mensagem->execucao,sizeExecute);
                                     mensagem->tipo = 1;
                                     gettimeofday(&(mensagem->end), NULL);
                                     mensagem->time = time_diff(&mensagem->start, &mensagem->end);

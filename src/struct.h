@@ -16,7 +16,7 @@
 typedef struct minfo{
     int id;
     int tipo; // 0 se for mensagem normal 
-    // e 1 se for um filho do server a mandar para o server
+              // 1 se for um filho do server a mandar para o server
     int operacao;//  0 == -p, 1 == -u, 2 == status
     int time;
     int pid; // para entrar em contacto com o cliente
@@ -26,18 +26,3 @@ typedef struct minfo{
     char execucao[sizeExecute];
     char nome[sizeExecute];
 }*minfo;
-
-/*
-Lista no servidor vai ser uma lista de minfo
-
-Elemento lista[2048]; //numero 2^n
-
-Filho termina de executar e comunica ao pai  -> pai escreve para no mesmo ficheiro (escrever o que esta no enunciado)
-*/
-
-// Exemplo de outro algoritmo sem ser o FIFO (First in first out - executar por ordem de chegada), ter a lista ordenada por os que demoram menos tempo a executar 
-
-// FIFO  1º 100 ms 2º 3000 ms 3º 5 ms primeiro a chegar primeiro a executar
-
-// Outra maneira ordenar pelo ordem crescente do tempo 1º 5 ms 2º 100 ms 3º 3000 ms tambem pode ser procurar o mais pequeno adicionas a 
-// lista no fim e quando for para executar um procurar o que tem menor valor de tempo

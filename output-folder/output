@@ -1,73 +1,348 @@
 ------------------
-TASK (id 1006, pid 40800)
+  TASK (id 1001, pid 75577)
    TIME 0 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:11 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:12 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:11 orchestrator
-
-------------------------------------
-TASK (id 1001, pid 43720)
-   TIME 2 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
-
-------------------------------------
-TASK (id 1002, pid 43740)
-   TIME 1 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
-
-------------------------------------
-TASK (id 1003, pid 43758)
-   TIME 1 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
-
-------------------------------------
-TASK (id 1004, pid 43774)
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1004, pid 75594)
    TIME 0 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:19 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1005, pid 75598)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1008, pid 75618)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1009, pid 75623)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1012, pid 75641)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1013, pid 75647)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1016, pid 75664)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1017, pid 75671)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1020, pid 75688)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1021, pid 75694)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1024, pid 75711)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1025, pid 75716)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1028, pid 75734)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1029, pid 75739)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1032, pid 75757)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1033, pid 75764)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1036, pid 75781)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1037, pid 75786)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1040, pid 75804)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1041, pid 75809)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1044, pid 75827)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1045, pid 75832)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1048, pid 75850)
+   TIME 0 miliseconds
+   COMMAND ls -l|wc
+   OUTPUT 
+------------------
+------------------
+  TASK (id 1003, pid 75587)
+   TIME 71 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1007, pid 75610)
+   TIME 71 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1011, pid 75634)
+   TIME 71 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1015, pid 75657)
+   TIME 71 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1019, pid 75681)
+   TIME 72 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1023, pid 75704)
+   TIME 73 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1027, pid 75727)
+   TIME 73 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1031, pid 75750)
+   TIME 73 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1035, pid 75774)
+   TIME 73 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1039, pid 75797)
+   TIME 72 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1043, pid 75820)
+   TIME 72 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1047, pid 75843)
+   TIME 73 miliseconds
+   COMMAND progteste/hello 1
+   OUTPUT 0: Hello, cosmos! May our paths intertwine in endless discovery
+1: Hello, cosmos! May our paths intertwine in endless discovery
+2: Hello, cosmos! May our paths intertwine in endless discovery
+3: Hello, cosmos! May our paths intertwine in endless discovery
+4: Hello, cosmos! May our paths intertwine inprogteste/hello 1
+------------------
+------------------
+  TASK (id 1002, pid 75583)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
 
-------------------------------------
-TASK (id 1001, pid 45497)
-   TIME 1 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:23 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+------------------
+------------------
+  TASK (id 1006, pid 75602)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
 
-------------------------------------
-TASK (id 1002, pid 45513)
-   TIME 1 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:23 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+------------------
+------------------
+  TASK (id 1010, pid 75630)
+   TIME 1000 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
 
-------------------------------------
-TASK (id 1003, pid 45529)
-   TIME 2 miliseconds
-   COMMAND ls -l
-   OUTPUT total 48
--rwxr-xr-x 1 edulinux edulinux 19696 May  1 15:19 client
-prw-r--r-- 1 edulinux edulinux     0 May  1 15:23 fifo_server
--rwxr-xr-x 1 edulinux edulinux 28528 May  1 15:19 orchestrator
+------------------
+------------------
+  TASK (id 1014, pid 75653)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1018, pid 75677)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1022, pid 75699)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1026, pid 75722)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1030, pid 75746)
+   TIME 1000 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1034, pid 75770)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1038, pid 75793)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1042, pid 75816)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
+
+------------------
+------------------
+  TASK (id 1046, pid 75838)
+   TIME 1001 miliseconds
+   COMMAND progteste/void 1
+   OUTPUT The magic number is 1804289383
 
 ------------------
