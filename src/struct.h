@@ -11,7 +11,7 @@
 #define SERVER "fifo_server" 
 #define CLIENT "fifo_client"
 #define sizeExecute 301
-#define OUTPUT "/home/edulinux/SO-1/output-folder/output"
+#define OUTPUT "SO-1/output-folder/output"
 
 typedef struct minfo{
     int id;
