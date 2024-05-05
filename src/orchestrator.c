@@ -97,6 +97,7 @@ int main(int argc, char * argv[]){
     }
 
     // Inicializa variáveis
+    int tempotestes = 0; // tempo de execução total
     int countID = 1001; // id das mensagens
     int countPT = 0; // quantos processos estão a decorrer neste momento
     int countfila = 0; // quantos processos estão na fila
@@ -132,6 +133,7 @@ int main(int argc, char * argv[]){
 	    int read_bytes = read(fifoserver_fd, mensagem, sizeof(struct minfo)); // Não precisas de verificar se a mensagem
                                                                               //está correta porque isso é visto no cliente
         if(mensagem->pid == 0){
+            printf("Tempo total: %d milisegundos\n", tempotestes);
             unlink(SERVER);
             return 0;
         }
@@ -141,6 +143,7 @@ int main(int argc, char * argv[]){
         printf("Quantos bytes li: %d\n", read_bytes);
         if(mensagem->tipo == 1){ // Se for uma tarefa a ser escrita no output
             countPT--;
+            tempotestes = tempotestes + mensagem->time;
             int pid = fork();
             if(pid==0){
                 int fdoutput = open(OUTPUT, O_CREAT|O_APPEND|O_WRONLY, 0777);
@@ -251,10 +254,12 @@ int main(int argc, char * argv[]){
                                 close(pipes[i][1]);
                             }
                         }
-                        read(pipes[rN][0],mensagem->execucao,sizeExecute);
+                        close(pipes[rN][1]);
+                        read(pipes[rN][0], mensagem->execucao, sizeExecute);
                         mensagem->tipo = 1;
                         gettimeofday(&(mensagem->end), NULL);
                         mensagem->time = time_diff(&mensagem->start, &mensagem->end);
+
 
                         int fifoserver_fd = open(SERVER, O_WRONLY, 0666);
                         write(fifoserver_fd,mensagem, sizeof(struct minfo));
